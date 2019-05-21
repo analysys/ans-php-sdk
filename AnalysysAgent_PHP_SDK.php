@@ -1,6 +1,6 @@
 <?php
 
-define('ANALYSYSAGENT_SDK_VERSION', '4.0.8');
+define('ANALYSYSAGENT_SDK_VERSION', '4.0.9');
 define('ANALYSYSAGENT_NO_DEBUG', 0);
 define('ANALYSYSAGENT_OPENNOSAVE_DEBUG', 1);
 define('ANALYSYSAGENT_OPENANDSAVE_DEBUG', 2);
@@ -40,10 +40,6 @@ class AnalysysAgent {
 	private function msectime() {
 		list($msec, $sec) = explode(' ', microtime());
 		return (float) sprintf('%.0f', (floatval($msec) + floatval($sec)) * 1000);
-	}
-
-	private function json_dumps($data) {
-		return json_encode($data);
 	}
 
 	private function is_debug() {
@@ -134,11 +130,25 @@ class AnalysysAgent {
 			);
 		}
 
-		foreach ($val as $value) {
+		foreach ($val as $key=>$value) {
 			if (is_numeric($value)) {
 				return array(
 					'code' => 400,
 					'msg' => 'Property value invalid, current type: String!',
+				);
+			}
+			if(strlen($value) == 0 ){
+				return array(
+					'code' => 400,
+					'msg' => 'The length of the property value string[' . $value . '] needs to be 1-255!',
+				);
+			}
+			if (strlen($value) > 255) {
+				return array(
+					'code' => 60001,
+					'msg' => 'The length of the property value string[' . $value . '] needs to be 1-255!',
+					'key'=>$key,
+					'value'=>$value
 				);
 			}
 		}
@@ -154,9 +164,15 @@ class AnalysysAgent {
 				'msg' => 'Property value invalid, current type: String!',
 			);
 		}
-		if (strlen($val) == 0 || strlen($val) > 255) {
+		if(strlen($val) == 0 ){
 			return array(
 				'code' => 400,
+				'msg' => 'The length of the property value string[' . $val . '] needs to be 1-255!',
+			);
+		}
+		if (strlen($val) > 255) {
+			return array(
+				'code' => 60001,
 				'msg' => 'The length of the property value string[' . $val . '] needs to be 1-255!',
 			);
 		}
@@ -204,12 +220,37 @@ class AnalysysAgent {
 				if ($errArr['code'] === 400) {
 					return $errArr;
 				}
+				if ($errArr['code'] === 60001) {
+					$newValue = $value[$errArr['key']];
+					if(strlen($newValue)>8092){
+						$newValue = substr($newValue,0,8091).'$';
+					}
+					$value[$errArr['key']] = $newValue;
+					return array(
+						'code'=>60001,
+						'key'=>$key,
+						'value'=>$value,
+						'msg' =>$errArr['msg']
+					);
+				}
 				continue;
 			}
 
 			$errVal = $this->checkValue($value);
 			if ($errVal['code'] === 400) {
 				return $errVal;
+			}
+			if ($errVal['code'] === 60001) {
+				$newValue = $value;
+				if(strlen($value)>8092){
+					$newValue = substr($value,0,8091).'$';
+				}
+				return array(
+					'code'=>60001,
+					'key'=>$key,
+					'value'=>$newValue,
+					'msg' =>$errVal['msg']
+				);
 			}
 		}
 
@@ -239,7 +280,7 @@ class AnalysysAgent {
 		}
 	}
 	private function _json_dumps($data) {
-        return json_encode($data);
+	    return urldecode(json_encode($this->array_urlencode($data)));
     }
     private function checkPlatform ($platform){
     	$pFormList = array('Java','python','JS','Node','PHP','WeChat','Android','iOS');
@@ -249,6 +290,15 @@ class AnalysysAgent {
     		}
     	}
     	return $platform;
+    }
+    private function array_urlencode($data){
+        $new_data = array();
+        foreach($data as $key => $val){
+            // ÕâÀïÎÒ¶Ô¼üÒ²½øÐÐÁËurlencode
+           
+            $new_data[urlencode($key)] = is_array($val) ? $this->array_urlencode($val) : (gettype($val)=='string'?urlencode($val):$val);
+        }
+        return $new_data;
     }
 	private function upload($distinctId, $isLogin, $eventName, $properties, $platform) {
 		if ($eventName == '$profile_set' || $eventName == '$profile_set_once' || $eventName == '$profile_increment' || $eventName == '$profile_unset' || $eventName == '$profile_delete'||$eventName == '$alias') {
@@ -260,12 +310,13 @@ class AnalysysAgent {
 		$errId= $this->checkKey($distinctId,'ID');
 		if($errId['code'] == 400){
 			throw new AnalysysAgentException($errId['msg']);
+			return ;
 		}
+		
 		$xcontext['$platform'] = is_null($platform)?'':$this->checkPlatform($platform);
 		$xcontext['$is_login'] = $isLogin;
-
 		$data = array(
-			'xwho' => $distinctId,
+			'xwho' => (string) $distinctId,
 			'xwhen' => $this->msectime(),
 			'xwhat' => $eventName,
 			'appid' => $this->_appid,
@@ -291,6 +342,12 @@ class AnalysysAgent {
 			throw new AnalysysAgentException($errPro['msg']);
 			return;
 		}
+		if($errPro['code'] == 60001){
+			$key = $errPro['key'];
+			$value = $errPro['value'];
+			$properties[$key] = $value;
+			print_r($errPro['msg']);
+		}
 		$this->upload($distinctId, $isLogin, $eventName, $properties, $platform);
 	}
 	public function setDebugMode($debug) {
@@ -308,6 +365,12 @@ class AnalysysAgent {
 			if ($this->is_debug() === true) {
 				throw new AnalysysAgentException($err['msg']);
 			}
+		}
+		if($err['code'] == 60001){
+			$key = $err['key'];
+			$value = $err['value'];
+			$properties[$key] = $value;
+			print_r($err['msg']);
 		}
 
 		$this->_xcontextSuperProperties = array_merge($this->_xcontextSuperProperties, $properties);
@@ -398,6 +461,13 @@ class AnalysysAgent {
 		if (is_null($original_id) || strlen($original_id) == 0) {
 			throw new AnalysysAgentException("original_id is empty.");
 		}
+
+		$errId= $this->checkKey($original_id,'ID');
+		if($errId['code'] == 400){
+			throw new AnalysysAgentException($errId['msg']);
+			return ;
+		}
+		
 		$properties = array(
 			'$original_id'=>$original_id
 		);
@@ -422,6 +492,12 @@ class AnalysysAgent {
 		if ($errPro['code'] == 400) {
 			throw new AnalysysAgentException($errPro['msg']);
 			return;
+		}
+		if($errPro['code'] == 60001){
+			$key = $errPro['key'];
+			$value = $errPro['value'];
+			$properties[$key] = $value;
+			print_r($errPro['msg']);
 		}
 		$this->upload($distinctId, $isLogin, $eventName, $properties, $platform);
 	}
@@ -476,7 +552,7 @@ class BatchConsumer extends Consumer {
 		$this->_appid = $appid;
 		$this->_debug = $debug;
 		$this->_buffers[] = $msg;
-		if (count($this->_buffers) >= $this->_max_data_size) {
+		if (!empty($this->_buffers)&&count($this->_buffers) >= $this->_max_data_size) {
 			return $this->flush();
 		}
 		return true;
@@ -560,14 +636,17 @@ class SyncConsumer extends Consumer {
 		$this->_debug=$debug;
 		$this->_appid = $appid;
 		$this->_buffers[] = $msg;
-		$this->flush();
+		if (count($this->_buffers)>0) {
+			return $this->flush();
+		}
 	}
 	public function flush() {
 		if (empty($this->_buffers)) {
 			$ret = false;
 		} else {
 			$this->logText($this->_buffers);
-			$ret = $this->_do_request($this->_encode_msg_list($this->_buffers));
+			$this->_do_request($this->_encode_msg_list($this->_buffers));
+			$ret = true;
 		}
 		if ($ret) {
 			$this->_buffers = array();
