@@ -7,7 +7,7 @@ This is the official PHP SDK for Argo.
 
 ## Learn More
 
-please visit [more](https://ark.analysys.cn/docs/sdk-PHP.html)
+please visit [more](https://docs.analysys.cn/ark/integration/sdk/php)
 
 ## License
 
