@@ -12,8 +12,9 @@ $ans->setDebugMode(2);
 $registerId = 'ABCDEF123456789';
 $isLogin = true;
 $platform = 'JS';
+
 $properties = array(
-	'registerTime'=>'20180101101010'
+    'registerTime'=>'20180101101010'
 );
 $ans->profileSetOnce($registerId,$isLogin,$properties,$platform);
 

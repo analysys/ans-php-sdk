@@ -11,5 +11,4 @@ $ans->setDebugMode(2);
 $property = $ans->getSuperProperty('userLevel');
 printf('getSuperProperty--->%s',$property);
 
-//$ans->flush() //批量
  ?>

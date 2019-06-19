@@ -13,7 +13,7 @@ $registerId = 'ABCDEF123456789';
 $isLogin = true;
 $platform = 'JS';
 $properties = array(
-	'userPoint'=>20
+    'userPoint'=>20
 );
 $ans->profileIncrement($registerId,$isLogin,$properties,$platform);
 

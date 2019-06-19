@@ -12,17 +12,18 @@ $ans->setDebugMode(2);
 $registerId = '1234567890987654321';
 $isLogin = true;
 $platform = 'JS';
+
 $properties = array(
-	'$city'=>'北京',
-	'$province'=>'北京',
-	'nickName'=>'昵称123',
-	'userLevel'=>0,
-	'userPoint'=>0,
-	'interest'=>array(
-		'户外活动',
-		'足球赛事',
-		'游戏'
-	)
+    '$city'=>'北京',
+    '$province'=>'北京',
+    'nickName'=>'昵称123',
+    'userLevel'=>0,
+    'userPoint'=>0,
+    'interest'=>array(
+        '户外活动',
+        '足球赛事',
+        '游戏'
+    )
 );
 $ans->profileSet($registerId,$isLogin,$properties,$platform);
 

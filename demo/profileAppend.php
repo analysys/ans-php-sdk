@@ -12,12 +12,13 @@ $ans->setDebugMode(2);
 $registerId = 'ABCDEF123456789';
 $isLogin = true;
 $platform = 'JS';
+ 
 $properties = array(
-	'interest'=>array(
-		'户外活动',
-		'足球赛事',
-		'游戏'
-	)
+    'interest'=>array(
+        '户外活动',
+        '足球赛事',
+        '游戏'
+    )
 );
 $ans->profileAppend($registerId,$isLogin,$properties,$platform);
 

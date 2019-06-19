@@ -9,7 +9,7 @@ $ans = new AnalysysAgent($consumer, $appid);
 $ans->setDebugMode(2);
 
 $properties = $ans->getSuperProperties();
-printf('getSuperProperties--->%s',$properties);
+print_r($properties);
 
 //$ans->flush() //批量
  ?>
