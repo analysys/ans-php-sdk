@@ -3,7 +3,7 @@
 
 ========
 
-This is the official PHP SDK for Argo.
+This is the official PHP SDK for Analysys.
 
 ## Learn More
 
