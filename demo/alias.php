@@ -1,4 +1,4 @@
-<?php 
+<?php
 require_once '../AnalysysAgent_PHP_SDK.php';
 
 $appid = '9421608fd544a65e';
@@ -8,11 +8,15 @@ $consumer = new SyncConsumer($server); //同步
 $ans = new AnalysysAgent($consumer, $appid);
 $ans->setDebugMode(2);
 
-
 $distinctId = '1234567890987654321';
-$registerId  = 'ABCDEF123456789';
+$registerId = 'ABCDEF123456789';
 $platform = 'JS';
-$ans->alias($registerId,$distinctId,$platform);
+function msectime()
+{
+    list($msec, $sec) = explode(' ', microtime());
+    return (float) sprintf('%.0f', (floatval($msec) + floatval($sec)) * 1000);
+}
+$xwhen = msectime();
+$ans->alias($registerId, $distinctId, $platform, $xwhen);
 
 //$ans->flush() //批量
- ?>

@@ -12,9 +12,9 @@ for ($x=0; $x<=10; $x++) {
   $testLang=$testLang.$testLang;
 }
 $properties = array(
-    'userLevel'=>0,
-    'userPoint'=>0,
-    'testLang'=>$testLang
+	'userLevel'=>0,
+	'userPoint'=>0,
+	'testLang'=>$testLang
 );
 $ans->registerSuperProperties($properties);
 

@@ -1,4 +1,4 @@
-<?php 
+<?php
 require_once '../AnalysysAgent_PHP_SDK.php';
 
 $appid = '9421608fd544a65e';
@@ -8,19 +8,24 @@ $consumer = new SyncConsumer($server); //同步
 $ans = new AnalysysAgent($consumer, $appid);
 $ans->setDebugMode(2);
 
-
 $registerId = 'ABCDEF123456789';
 $isLogin = true;
 $platform = 'JS';
- 
+
 $properties = array(
-    'interest'=>array(
+    'interest' => array(
         '户外活动',
         '足球赛事',
-        '游戏'
-    )
+        '游戏',
+    ),
 );
-$ans->profileAppend($registerId,$isLogin,$properties,$platform);
+function msectime()
+{
+    list($msec, $sec) = explode(' ', microtime());
+    return (float) sprintf('%.0f', (floatval($msec) + floatval($sec)) * 1000);
+}
+$xwhen = msectime();
+
+$ans->profileAppend($registerId, $isLogin, $properties, $platform, $xwhen);
 
 //$ans->flush() //批量
- ?>
