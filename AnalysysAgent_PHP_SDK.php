@@ -1,6 +1,6 @@
 <?php
 
-define('ANALYSYSAGENT_SDK_VERSION', '4.0.11');
+define('ANALYSYSAGENT_SDK_VERSION', '4.0.12');
 define('ANALYSYSAGENT_NO_DEBUG', 0);
 define('ANALYSYSAGENT_OPENNOSAVE_DEBUG', 1);
 define('ANALYSYSAGENT_OPENANDSAVE_DEBUG', 2);
@@ -19,7 +19,7 @@ class AnalysysAgent {
 	public function __construct($consumer, $appId) {
 		$this->_consumer = $consumer;
 		$this->_appid = $appId;
-		if (strtoupper(substr(PHP_OS, 0, 3)) == "WIN") {
+		if (strtoupper(substr(PHP_OS, 0, 3)) === "WIN") {
 			$this->_win = true;
 		}
 		$this->setBaseProperties();
@@ -59,7 +59,7 @@ class AnalysysAgent {
 		$debug = '$debug';
 		$is_login = '$is_login';
 
-		if (strcmp($s,$lib)==0|| strcmp($s,$lib_version)==0 || strcmp($s,$platform)==0 || strcmp($s,$first_visit_time)==0|| $s === $debug || $s === $is_login) {
+		if (strcmp($s,$lib) === 0|| strcmp($s,$lib_version) === 0 || strcmp($s,$platform) === 0 || strcmp($s,$first_visit_time) === 0|| $s === $debug || $s === $is_login) {
 			return array(
 				'code' => 400,
 				'msg' => 'Property value invalid, nonsupport value: $lib/$lib_version/$platform/$first_visit_time/$debug/$is_login',
@@ -166,7 +166,7 @@ class AnalysysAgent {
 					'msg' => 'Property value invalid, current type: String!',
 				);
 			}
-			if(strlen($value) == 0 ){
+			if(strlen($value) === 0 ){
 				return array(
 					'code' => 400,
 					'msg' => 'The length of the property value string[' . $value . '] needs to be 1-255!',
@@ -198,7 +198,7 @@ class AnalysysAgent {
 				'code' => 200,
 			);
 		}
-		if(strlen($val) == 0 ){
+		if(strlen($val) === 0 ){
 			return array(
 				'code' => 400,
 				'msg' => 'The length of the property value string[' . $val . '] needs to be 1-255!',
@@ -287,7 +287,7 @@ class AnalysysAgent {
 			}
 		}
 
-		if ((count($property) == 0 || count($property) > 100)&& $type !=='NOLENGTH') {
+		if ((count($property) === 0 || count($property) > 100) && $type !== 'NOLENGTH') {
 			$errPro = array(
 				'code' => 400,
 				'msg' => 'The length of the property key-value pair needs to be 1-99!',
@@ -308,7 +308,7 @@ class AnalysysAgent {
 		);
 	}
 	private function logText($msg, $str = "") {
-		if ($this->is_debug()) {
+		if ($this->is_debug() === true) {
 			printf($msg, $str);
 		}
 	}
@@ -318,7 +318,7 @@ class AnalysysAgent {
     private function checkPlatform ($platform){
     	$pFormList = array('Java','python','JS','Node','PHP','WeChat','Android','iOS');
     	foreach ($pFormList as $key => $value) {
-    		if(strtolower($value) == strtolower($platform)){
+    		if(strtolower($value) === strtolower($platform)){
     			return $value;
     		}
 		}
@@ -329,19 +329,19 @@ class AnalysysAgent {
         foreach($data as $key => $val){
             // ÕâÀïÎÒ¶Ô¼üÒ²½øÐÐÁËurlencode
            
-            $new_data[urlencode($key)] = is_array($val) ? $this->array_urlencode($val) : (gettype($val)=='string'?urlencode($val):$val);
+            $new_data[urlencode($key)] = is_array($val) ? $this->array_urlencode($val) : (gettype($val) === 'string' ? urlencode($val) : $val);
         }
         return $new_data;
     }
 	private function upload($distinctId, $isLogin, $eventName, $properties, $platform, $xwhen) {
-		if ($eventName == '$profile_set' || $eventName == '$profile_set_once' || $eventName == '$profile_increment' || $eventName == '$profile_unset' || $eventName == '$profile_delete'||$eventName == '$alias'||$eventName == '$profile_append') {
+		if ($eventName === '$profile_set' || $eventName === '$profile_set_once' || $eventName === '$profile_increment' || $eventName === '$profile_unset' || $eventName === '$profile_delete'||$eventName === '$alias'||$eventName === '$profile_append') {
 			$xcontext = array_merge($this->_baseProperties, $properties);
 		}else{
 			$xcontext = array_merge($this->_baseProperties,$this->_xcontextSuperProperties, $properties);
 		}
 
 		$errId= $this->checkKey($distinctId,'ID');
-		if($errId['code'] == 400){
+		if($errId['code'] === 400){
 			throw new AnalysysAgentException($errId['msg']);
 			return ;
 		}
@@ -350,11 +350,11 @@ class AnalysysAgent {
 			$xwhen = $this->msectime();
 		}else{
 			$errTime = $this ->checkTime($xwhen);
-			if($errTime['code'] == 400){
+			if($errTime['code'] === 400){
 				throw new AnalysysAgentException($errTime['msg']);
 				return ;
 			}
-			if($errTime['code'] == 201){
+			if($errTime['code'] === 201){
 				$xwhen = (int) $xwhen;
 			}
 		}
@@ -378,16 +378,16 @@ class AnalysysAgent {
 			throw new AnalysysAgentException("isLogin is not boolean.");
 		}
 
-		if (count($properties) == 0) {
+		if (count($properties) === 0) {
 			throw new AnalysysAgentException("The length of the property key-value pair needs to be 1-99!");
 		}
 
 		$errPro = $this->checkProperty($properties,$type);
-		if ($errPro['code'] == 400) {
+		if ($errPro['code'] === 400) {
 			throw new AnalysysAgentException($errPro['msg']);
 			return;
 		}
-		if($errPro['code'] == 60001){
+		if($errPro['code'] === 60001){
 			$key = $errPro['key'];
 			$value = $errPro['value'];
 			$properties[$key] = $value;
@@ -411,7 +411,7 @@ class AnalysysAgent {
 				throw new AnalysysAgentException($err['msg']);
 			}
 		}
-		if($err['code'] == 60001){
+		if($err['code'] === 60001){
 			$key = $err['key'];
 			$value = $err['value'];
 			$properties[$key] = $value;
@@ -500,15 +500,15 @@ class AnalysysAgent {
 	}
 
 	public function alias($aliasId, $original_id, $platform, $xwhen =null){
-		if (is_null($aliasId) || strlen($aliasId) == 0) {
+		if (is_null($aliasId) || strlen($aliasId) === 0) {
 			throw new AnalysysAgentException("aliasId is empty.");
 		}
-		if (is_null($original_id) || strlen($original_id) == 0) {
+		if (is_null($original_id) || strlen($original_id) === 0) {
 			throw new AnalysysAgentException("original_id is empty.");
 		}
 
 		$errId= $this->checkKey($original_id,'ID');
-		if($errId['code'] == 400){
+		if($errId['code'] === 400){
 			throw new AnalysysAgentException($errId['msg']);
 			return ;
 		}
@@ -520,7 +520,7 @@ class AnalysysAgent {
 		$this->upload($aliasId, true, '$alias', $properties, $platform, $xwhen);
 	}
 	public function track($distinctId = null, $isLogin = false,$eventName=null, $properties = array(), $platform = ANALYSYSAGENT_SDK_LIB, $xwhen =null) {
-		if (is_null($distinctId) || strlen($distinctId) == 0) {
+		if (is_null($distinctId) || strlen($distinctId) === 0) {
 			throw new AnalysysAgentException("aliasId is empty.");
 		}
 		if (!is_bool($isLogin)) {
@@ -528,17 +528,17 @@ class AnalysysAgent {
 		}
 
 		$errName = $this->checkkey($eventName,'NAME');
-		if ($errName['code'] == 400) {
+		if ($errName['code'] === 400) {
 			throw new AnalysysAgentException($errName['msg']);
 			return;
 		}
 
 		$errPro = $this->checkProperty($properties,'NOLENGTH');
-		if ($errPro['code'] == 400) {
+		if ($errPro['code'] === 400) {
 			throw new AnalysysAgentException($errPro['msg']);
 			return;
 		}
-		if($errPro['code'] == 60001){
+		if($errPro['code'] === 60001){
 			$key = $errPro['key'];
 			$value = $errPro['value'];
 			$properties[$key] = $value;
@@ -573,7 +573,7 @@ class BatchConsumer extends Consumer {
 	private $_debug;
 
 	private function logText($msg) {
-		if ($this->_debug == true) {
+		if ($this->_debug === true) {
 			print_r($msg);
 		}
 	}
@@ -659,7 +659,7 @@ class SyncConsumer extends Consumer {
 	private $_debug;
 
 	private function logText($msg) {
-		if ($this->_debug == true) {
+		if ($this->_debug === true) {
 			print_r($msg);
 		}
 	}
@@ -735,4 +735,119 @@ class SyncConsumer extends Consumer {
 	public function close() {
 		return $this->flush();
 	}
+}
+class FileConsumer extends Consumer
+{
+	private $_file_path;
+	private $_async;
+	private $_rule;
+	private $_batch_num;
+	private $_debug;
+	private $_file_handler;
+	private $_msg;
+	private $_buffers;
+	private $_file_handler_buffers;
+
+    private function logText($msg)
+    {
+        if ($this->_debug === true) {
+            print_r($msg);
+        }
+    }
+
+    public function __construct($file_path, $rule='HOUR',$async = false, $batch_num = null)
+    {
+        if (!$file_path) {
+            throw new AnalysysAgentException("file path invalid.");
+		}
+		if(!preg_match('/\/$/', $file_path)){
+			$file_path = $file_path.'/';
+		}
+		if(!is_dir($file_path)){
+			mkdir($file_path,0777,true);
+		}
+		if(is_bool($async)){
+			$this->_async = $async;
+		}
+
+		if($rule === 'DAY'){
+			$this->_rule = 'Ymd';
+		}else{
+			$this->_rule = 'YmdH';
+		}
+		if(is_int($batch_num) && $batch_num > 0){
+			$this->_batch_num = $batch_num;
+		}else{
+			$this->_batch_num = 20;
+		}
+
+		$this->_file_path = $file_path;
+		$this->_file_handler_buffers =array();
+		$this->_buffers = array();
+
+    }
+    public function send($msg, $appid, $debug)
+    {
+        $this->_debug = $debug;
+		$this->_buffers[]=$msg;
+		//开启异步批量保存，按照批量保存数量进行保存文件
+		//需在结束sdk功能时，及文件切分时将保存的日志进行保存
+		if($this->_async === true &&  count($this->_buffers)<= $this->_batch_num){
+			return;
+		}
+		$this->writeLog();
+	}
+	private function writeLog(){
+
+		if(empty($this->_buffers)){
+			return;
+		}
+
+		$now_date = date($this->_rule);
+		$this->_file_handler = $this->_file_handler_buffers[$now_date];
+		$file_name = $this->_file_path . 'datas_' . $now_date . '.log';
+
+		if (!$this->_file_handler || !file_exists($file_name)) {
+			//打开文件，如未有该文件则尝试新增。打开后将指针指向文件末尾
+			$this->_file_handler = fopen($file_name, 'a+');
+			$this->_file_handler_buffers[$now_date] = $this->_file_handler;
+
+		}
+
+		//添加锁定，如该文件已被锁定。等待锁定解锁后执行
+		if (flock($this->_file_handler, LOCK_EX)) {
+
+			$this->logText($this->_buffers);
+			//写文件
+			$msg = implode("\n",$this->_buffers)."\n";
+			
+			$ret = fwrite($this->_file_handler, $msg);
+			//解除锁定
+			flock($this->_file_handler, LOCK_UN);
+			//记录置空
+			$this->_buffers = array();
+		}
+		return;
+	}
+    public function flush()
+    {
+		foreach ($this->_file_handler_buffers as $value) {
+			flock($value, LOCK_UN);
+		}
+
+		if(!empty($this->_buffers)){
+			$this->writeLog();
+		}
+
+		foreach($this->_file_handler_buffers as $value){
+			fclose($value);
+		}
+		$this->_buffers = array();
+		$this->_file_handler_buffers = array();
+    }
+
+    public function close()
+    {
+        return $this->flush();
+    }
 }

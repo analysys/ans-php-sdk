@@ -1,24 +1,30 @@
 <?php
 require_once 'AnalysysAgent_PHP_SDK.php';
+date_default_timezone_set('prc');
+
 $appid = '9421608fd544a65e';
-$server = 'https://arksdk.analysys.cn:4089/';
-$consumer = new BatchConsumer($server);
+$async = true;
+$batch_num = 100;
+$rule = 'HOUR';
+$file_path = './log';
+$consumer = new FileConsumer($file_path, $rule, $async, $batch_num);
+
 $ans = new AnalysysAgent($consumer, $appid);
-$ans->setDebugMode(2);
+$ans->setDebugMode(0);
 
-$properties = array('aaa' => 111, 'ccc' => 'sssddd');
-// $ans->registerSuperProperties($properties);
+function run($i = 0, $ans)
+{
 
-// $propertyName = 'aaa';
-// $ans->unRegisterSuperProperty($propertyName);
+    $properties = array('aaa' => 111, 'ccc' => 'sssddd');
+    $ans->track('aaa' . $i, false, 'gaolaoshi', $properties);
+    $ans->track('bbb' . $i, false, 'gaolaoshi', $properties);
+    $ans->track('ccc' . $i, false, 'gaolaoshi', $properties);
+    $ans->track('ddd' . $i, false, 'gaolaoshi', $properties);
+    $ans->track('eee' . $i, false, 'gaolaoshi', $properties);
+}
 
-// $ans->clearSuperProperties();
+for ($i = 0; $i < 100; $i++) {
+    run($i, $ans);
 
-// $key = 'ccc';
-// $ans->getSuperProperty($key);
-
-$ans->track('5556666', false,'gaolaoshi', $properties);
-// $ans->track('2122', true, $properties);
+}
 $ans->flush();
-
-?>
