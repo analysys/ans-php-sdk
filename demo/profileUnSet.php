@@ -4,7 +4,9 @@ require_once '../AnalysysAgent_PHP_SDK.php';
 $appid = '9421608fd544a65e';
 $server = 'https://arksdk.analysys.cn:4089/';
 $consumer = new SyncConsumer($server); //同步
-//$consumer = new BatchConsumer($server); // 批量
+// $consumer = new BatchConsumer($server); // 批量
+// $consumer = new FileConsumer('./log'); // 存文件
+
 $ans = new AnalysysAgent($consumer, $appid);
 $ans->setDebugMode(2);
 
@@ -19,7 +21,9 @@ function msectime()
 }
 $xwhen = msectime();
 
-$ans->profileUnSet($registerId, $isLogin, "nickName", $platform, $xwhen);
+$ret = $ans->profileUnSet($registerId, $isLogin, "nickName", $platform, $xwhen);
+print_r('API status:');
+var_dump($ret) . '/n';
 
 // $ans->profileDelete($registerId,$isLogin,$platform);
 
